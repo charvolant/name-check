@@ -132,6 +132,7 @@ class Taxon extends NameEntry {
                         database.error(this, "Ancestor taxon ${parent.taxonLsid} contains cycle", ErrorClass.TAXON_STRUCTURE)
                         parent = null
                     } else {
+                        seen << parent.taxonLsid
                         parents = database.taxa[parent.parentTaxonLsid]
                         parent = parents == null || parents.isEmpty() ? null : parents[0]
                     }
