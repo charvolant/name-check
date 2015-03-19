@@ -157,6 +157,9 @@ class Taxon extends NameEntry {
         if (synonymCount > database.synonymLimit)
             database.error(this, "Taxon has ${synonymCount} synonyms", ErrorClass.TAXON_MAPPING)
 
+        if (database.topRank != null && rk != null && rk.level > database.topRank.level && parentTaxonLsid == null)
+            database.error(this, "Top rank is ${database.topRank.name}/${database.topRank.level} but taxon with rank ${rk.name}/${rk.level} has no parent", ErrorClass.TAXON_STRUCTURE)
+
         // Parent structure errors
         if (parentTaxonLsid != null) {
             def parents = database.taxa[parentTaxonLsid]

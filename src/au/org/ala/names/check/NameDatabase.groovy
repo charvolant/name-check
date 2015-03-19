@@ -17,6 +17,8 @@ class NameDatabase {
     Map<String, List<Synonym>> synonyms = [:]
     Map<String, List<Taxon>> taxa = [:]
     List<ErrorReport> errors = []
+    /** The highest rank level in the taxa */
+    RankStructure.Rank topRank
     /** Where to get worried about the number of common names */
     int commonNameLimit = 10
     /** Where to get worried about the number of synonyms */
@@ -86,6 +88,21 @@ class NameDatabase {
     }
 
     /**
+     * Work out what the top level rank in the taxa is
+     */
+    def computeTopRank() {
+        topRank = null
+
+        for (t in taxa.values())
+            for (taxon in t) {
+                def rank = ranks.rank(taxon.rank ?: taxon.rankCode)
+
+                if (rank != null && rank.level > 0 && (topRank == null || topRank.level > rank.level))
+                    topRank = rank
+            }
+    }
+
+    /**
      * Allocate common name and synonym counts to taxa
      */
     def computeStatistics() {
@@ -117,6 +134,7 @@ class NameDatabase {
      * Run a check on the database
      */
     def check() {
+        computeTopRank()
         computeStatistics()
         for (n in commonNames.values())
             for (name in n)
@@ -131,11 +149,12 @@ class NameDatabase {
 
     def report(PrintWriter writer, int limit) {
         writer.println("\"Statistics\",\"\",\"\",\"\",\"\",\"\"")
-        writer.println("\"\",\"Total Taxa\",\"\",\"\",\"${taxa.size()}\",\"\"")
-        writer.println("\"\",\"Total Common Names\",\"\",\"\",\"${countCommonNames}\",\"\"")
-        writer.println("\"\",\"Total Synonyms\",\"\",\"\",\"${countSynonyms}\",\"\"")
-        writer.println("\"\",\"Multi Common Names\",\"\",\"\",\"${multipleCommonNames}\",\"\"")
-        writer.println("\"\",\"Multi Synonyms\",\"\",\"\",\"${multipleSynonyms}\",\"\"")
+        writer.println("\"\",\"Total Taxa\",\"${taxa.size()}\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Total Common Names\",\"${countCommonNames}\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Total Synonyms\",\"${countSynonyms}\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Multi Common Names\",\"${multipleCommonNames}\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Multi Synonyms\",\"${multipleSynonyms}\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Highest Rank\",\"${topRank?.name}/${topRank?.level}\",\"\",\"\",\"\"")
         writer.println("\"Issues\",\"\",\"\",\"\",\"\",\"\"")
         writer.println("\"Origin\",\"Rank\",\"Name\",\"LSID\",\"Issue\",\"Class\"")
         for (ec in ErrorClass.values()) {
