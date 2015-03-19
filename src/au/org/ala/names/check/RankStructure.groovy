@@ -20,7 +20,7 @@ class RankStructure {
     RankStructure(InputStream source) {
         JsonSlurper slurper = new JsonSlurper()
         def rs = slurper.parse(source)
-        int level = 0
+        int level = 1
 
         for (rank in rs.ranks) {
             Rank r = new Rank(rank, level)

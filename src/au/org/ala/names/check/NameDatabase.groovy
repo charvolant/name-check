@@ -17,6 +17,19 @@ class NameDatabase {
     Map<String, List<Synonym>> synonyms = [:]
     Map<String, List<Taxon>> taxa = [:]
     List<ErrorReport> errors = []
+    /** Where to get worried about the number of common names */
+    int commonNameLimit = 10
+    /** Where to get worried about the number of synonyms */
+    int synonymLimit = 100
+    /** The total number of common names */
+    int countCommonNames
+    /** The total number of synonyms */
+    int countSynonyms
+    /** The number of common names with mutliple taxa */
+    int multipleCommonNames
+    /** The number of synonyms with mutliple taxa */
+    int multipleSynonyms
+
 
     NameDatabase(File dwca, RankStructure ranks) {
         this.ranks = ranks;
@@ -72,7 +85,39 @@ class NameDatabase {
         errors << new ErrorReport(entry, error, errorClass)
     }
 
+    /**
+     * Allocate common name and synonym counts to taxa
+     */
+    def computeStatistics() {
+        for (t in taxa.values()) {
+            t[0].commonNameCount = 0
+            t[0].synonymCount = 0
+        }
+        countCommonNames = 0
+        countSynonyms = 0
+        multipleCommonNames = 0
+        multipleSynonyms = 0
+        for (n in commonNames.values()) {
+            countCommonNames += n.size()
+            if (n.size() > 1)
+                multipleCommonNames++
+            for (name in n)
+                name.allocateStatistics(this)
+        }
+        for (s in synonyms.values()) {
+            countSynonyms += s.size()
+            if (s.size() > 1)
+                multipleSynonyms++
+            for (synonym in s)
+                synonym.allocateStatistics(this)
+        }
+    }
+
+    /**
+     * Run a check on the database
+     */
     def check() {
+        computeStatistics()
         for (n in commonNames.values())
             for (name in n)
                 name.check(this)
@@ -85,14 +130,21 @@ class NameDatabase {
     }
 
     def report(PrintWriter writer, int limit) {
-        writer.println("\"Origin\",\"Rank\",\"Name\",\"LSID\",\"Error\",\"Error Class\"")
+        writer.println("\"Statistics\",\"\",\"\",\"\",\"\",\"\"")
+        writer.println("\"\",\"Total Taxa\",\"\",\"\",\"${taxa.size()}\",\"\"")
+        writer.println("\"\",\"Total Common Names\",\"\",\"\",\"${countCommonNames}\",\"\"")
+        writer.println("\"\",\"Total Synonyms\",\"\",\"\",\"${countSynonyms}\",\"\"")
+        writer.println("\"\",\"Multi Common Names\",\"\",\"\",\"${multipleCommonNames}\",\"\"")
+        writer.println("\"\",\"Multi Synonyms\",\"\",\"\",\"${multipleSynonyms}\",\"\"")
+        writer.println("\"Issues\",\"\",\"\",\"\",\"\",\"\"")
+        writer.println("\"Origin\",\"Rank\",\"Name\",\"LSID\",\"Issue\",\"Class\"")
         for (ec in ErrorClass.values()) {
             def errs = errors.findAll { err -> err.errorClass == ec }
             def lim = limit < 0 ? errs.size() : Math.min(limit, errs.size())
-            writer.println("\"Count\",\"\",\"\",\"\",\"${errs.size()} errors (first ${lim} shown)\",\"${ec}\"")
+            writer.println("\"Count\",\"\",\"\",\"\",\"${errs.size()} issues (first ${lim} shown)\",\"${ec}\"")
             for (int i = 0; i < lim; i++)
                 errs[i].report(writer)
         }
-        writer.println("\"Total\",\"\",\"\",\"\",\"${errors.size()} errors\",\"\"")
+        writer.println("\"Total\",\"\",\"\",\"\",\"${errors.size()} issues\",\"\"")
     }
 }

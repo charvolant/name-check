@@ -63,6 +63,17 @@ abstract class NameEntry {
         writer.print(key())
         writer.print("\"")
     }
+
+    /**
+     * Allocate statistical counts to other elements.
+     * <p>
+     *     By default, this does nothing.
+     *     Subclasses can override this
+     *
+     *  @param database The database
+     */
+    void allocateStatistics(NameDatabase database) {
+    }
 }
 
 class CommonName extends NameEntry {
@@ -78,6 +89,14 @@ class CommonName extends NameEntry {
     }
 
     String classifier() { return "Common Name" }
+
+    void allocateStatistics(NameDatabase database) {
+        if (synonymOfLsid) {
+            def taxa = database.taxa[synonymOfLsid] ?: []
+            for (t in taxa)
+                t.commonNameCount++
+        }
+    }
 }
 
 class Synonym extends NameEntry {
@@ -100,20 +119,45 @@ class Synonym extends NameEntry {
     }
 
     String classifier() { return "Synonym" }
+
+    void allocateStatistics(NameDatabase database) {
+        if (synonymOfLsid) {
+            def taxa = database.taxa[synonymOfLsid] ?: []
+            for (t in taxa)
+                t.synonymCount++
+        }
+    }
 }
 
 class Taxon extends NameEntry {
-    Taxon(String[] line) { super(line) }
+    int commonNameCount
+    int synonymCount
+
+    Taxon(String[] line) {
+        super(line)
+        commonNameCount = 0
+        synonymCount = 0
+    }
 
     String key() { return taxonLsid }
 
     void check(NameDatabase database) {
         def rk = database.ranks.rank(rank ?: rankCode)
         def rkc = database.ranks.rank(rankCode)
+
+        // Rank errors
         if (rk == null)
             database.error(this, "Unknown rank code ${rankCode}", ErrorClass.TAXON_STRUCTURE)
         else if (rkc != null && rkc != rk)
             database.error(this, "Rank code ${rankCode} does not match rank name ${rank}", ErrorClass.TAXON_MAPPING)
+
+        // Name statistics (catch outliers)
+        if (commonNameCount > database.commonNameLimit)
+            database.error(this, "Taxon has ${commonNameCount} common names", ErrorClass.TAXON_MAPPING)
+        if (synonymCount > database.synonymLimit)
+            database.error(this, "Taxon has ${synonymCount} synonyms", ErrorClass.TAXON_MAPPING)
+
+        // Parent structure errors
         if (parentTaxonLsid != null) {
             def parents = database.taxa[parentTaxonLsid]
             def parent = null
