@@ -12,6 +12,7 @@ package au.org.ala.names.check
  */
 abstract class NameEntry {
     String rankCode
+    String rank
     String name
     String authority
     String fullName
@@ -30,6 +31,7 @@ abstract class NameEntry {
         def tlc = { v -> v == null ? null : v.toLowerCase() }
 
         rankCode = tlc(nullcheck(line[0]))
+        rank = tlc(nullcheck(line[1]))
         name = nullcheck line[3]
         authority = nullcheck line[4]
         fullName = nullcheck line[5]
@@ -106,22 +108,24 @@ class Taxon extends NameEntry {
     String key() { return taxonLsid }
 
     void check(NameDatabase database) {
-        def rank = NameDatabase.RANKS[rankCode]
-
-        if (rank == null)
+        def rk = database.ranks.rank(rank ?: rankCode)
+        def rkc = database.ranks.rank(rankCode)
+        if (rk == null)
             database.error(this, "Unknown rank code ${rankCode}", ErrorClass.TAXON_STRUCTURE)
+        else if (rkc != null && rkc != rk)
+            database.error(this, "Rank code ${rankCode} does not match rank name ${rank}", ErrorClass.TAXON_MAPPING)
         if (parentTaxonLsid != null) {
             def parents = database.taxa[parentTaxonLsid]
             def parent = null
 
             if (parents == null || parents.isEmpty())
                 database.error(this, "Missing parent taxon LSID ${parentTaxonLsid}", ErrorClass.TAXON_STRUCTURE)
-                else
+            else
                 parent = parents[0]
-            if (parent != null && rank != null) {
-                def prank = NameDatabase.RANKS[parent.rankCode] ?: Integer.MAX_VALUE
-                if (prank > 0 && rank > 0 && prank >= rank)
-                    database.error(this, "Parent taxon ${parentTaxonLsid} rank ${parent.rankCode}/${prank} is not above ${rankCode}/${rank}", ErrorClass.TAXON_STRUCTURE)
+            if (parent != null && rk != null) {
+                def prank = database.ranks.rank(parent.rank ?: parent.rankCode).level ?: Integer.MAX_VALUE
+                if (prank > 0 && rk.level > 0 && prank >= rk.level)
+                    database.error(this, "Parent taxon ${parentTaxonLsid} rank ${parent.rank}/${prank} is not above ${rank}/${rk.level}", ErrorClass.TAXON_STRUCTURE)
             }
             // Check for cycles
             if (parent != null) {

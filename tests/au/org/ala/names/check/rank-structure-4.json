@@ -1,0 +1,12 @@
+{
+  "ranks": [
+    {
+      "name": "Kingdom",
+      "synonyms": [ "reg" ]
+    },
+    {
+      "name": "Phylum",
+      "synonyms": [ "reg" ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "ranks": [
+    {
+      "name": "Kingdom",
+      "synonyms": [ "reg" ]
+    },
+    {
+      "name": "Phylum",
+      "synonyms": [ "phyl_div", "Division", "div" ]
+    },
+    {
+      "name": "Class",
+      "synonyms": [ "cl" ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "ranks": [
+    {
+      "name": "Kingdom"
+    },
+    {
+      "name": "Phylum",
+      "level": -1
+    },
+    {
+      "name": "Class"
+    }
+  ]
+}

@@ -12,53 +12,14 @@ import java.util.zip.ZipFile
  * Copyright (c) 2015 CSIRO
  */
 class NameDatabase {
-    static RANKS = [
-            "reg"        : 1,
-            "phyl_div"   : 2,
-            "division"   : 2,
-            "div"        : 2,
-            "subphyl_div": 3,
-            "subdivision": 3,
-            "supercl"    : 4,
-            "cl"         : 5,
-            "subcl"      : 6,
-            "infracl"    : 7,
-            "superord"   : 8,
-            "superordo"  : 8,
-            "cohort"     : 9,
-            "ord"        : 9,
-            "ordo"       : 9,
-            "subord"     : 10,
-            "subordo"    : 10,
-            "infraord"   : 11,
-            "section"    : 12,
-            "superfam"   : 14,
-            "fam"        : 15,
-            "subfam"     : 16,
-            "supertrib"  : 17,
-            "trib"       : 18,
-            "subtrib"    : 19,
-            "gen"        : 20,
-            "subgen"     : 21,
-            "subg"       : 21,
-            "sect"       : 22,
-            "subsect"    : 23,
-            "subsp_aggr" : 24,
-            "sp"         : 25,
-            "ssp"        : 26,
-            "subsp"      : 27,
-            "var"        : 28,
-            "f"          : 29,
-            "cv"         : 29,
-            "taxsupragen": -1
-    ]
-
+    RankStructure ranks
     Map<String, List<CommonName>> commonNames = [:]
     Map<String, List<Synonym>> synonyms = [:]
     Map<String, List<Taxon>> taxa = [:]
     List<ErrorReport> errors = []
 
-    NameDatabase(File dwca) {
+    NameDatabase(File dwca, RankStructure ranks) {
+        this.ranks = ranks;
         load(dwca)
     }
 

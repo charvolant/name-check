@@ -1,0 +1,103 @@
+{
+  "ranks": [
+    {
+      "name": "Kingdom",
+      "synonyms": [ "reg" ]
+    },
+    {
+      "name": "Phylum",
+      "synonyms": [ "phyl_div", "Division", "div" ]
+    },
+    {
+      "name": "SubPhylum",
+      "synonyms": [ "subphyl_div", "SubDivision", "subdiv" ]
+    },
+    {
+      "name": "Superclass",
+      "synonyms": [ "supercl" ]
+    },
+    {
+      "name": "Class",
+      "synonyms": [ "cl" ]
+    },
+    {
+      "name": "Subclass",
+      "synonyms": [ "subcl" ]
+    },
+    {
+      "name": "InfraClass",
+      "synonyms": [ "infracl" ]
+    },
+    {
+      "name": "SuperOrder",
+      "synonyms": [ "superord" ]
+    },
+    {
+      "name": "Order",
+      "synonyms": [ "ord", "Cohort"]
+    },
+    {
+      "name": "SubOrder",
+      "synonyms": [ "subord" ]
+    },
+    {
+      "name": "InfraOrder",
+      "synonyms": [ "infraord" ]
+    },
+    {
+      "name": "Section"
+    },
+    {
+      "name": "SuperFamily",
+      "synonyms": [ "superfam" ]
+    },
+    {
+      "name": "Family",
+      "synonyms": [ "fam" ]
+    },
+    {
+      "name": "SubFamily",
+      "synonyms": [ "subfam" ]
+    },
+    {
+      "name": "SuperTribe",
+      "synonyms": [ "supertrib" ]
+    },
+    {
+      "name": "Tribe",
+      "synonyms": [ "trib" ]
+    },
+    {
+      "name": "SubTribe",
+      "synonyms": [ "subtrib" ]
+    },
+    {
+      "name": "Aggregate Genera"
+    },
+    {
+      "name": "Genus",
+      "synonyms": [ "gen" ]
+    },
+    {
+      "name": "Subgenus",
+      "synonyms": [ "subgen" ]
+    },
+    {
+      "name": "Aggregate Species",
+      "synonyms": [ "subsp_aggr" ]
+    },
+    {
+      "name": "Species",
+      "synonyms": [ "sp" ]
+    },
+    {
+      "name": "Subspecies",
+      "synonyms": [ "ssp" ]
+    },
+    {
+      "name": "Higher Taxon",
+      "synonyms": [ "taxsupragen" ],
+      "level": -1
+    }
+  ]
+}

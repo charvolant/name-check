@@ -9,15 +9,16 @@ package au.org.ala.names.check
  */
 
 def zip = new File(args[0])
-def db = new NameDatabase(zip)
+def ranks = new RankStructure(new FileInputStream(args[1]))
+def db = new NameDatabase(zip, ranks)
 def pw
 def lim
 
-if (args.length == 1) {
+if (args.length == 2) {
     pw = new PrintWriter(System.out)
     lim = 10
 } else {
-    pw = new PrintWriter(new FileOutputStream(args[1]))
+    pw = new PrintWriter(new FileOutputStream(args[2]))
     lim = -1
 }
 db.check()
