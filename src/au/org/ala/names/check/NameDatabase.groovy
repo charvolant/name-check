@@ -7,15 +7,30 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 /**
+ * A database of taxa, common names linked to taxa and synonyms for taxa.
+ * <p>
+ *     The database also contains a collection of error reports and statistics
+ *     describing the contents of the database.
+ * </p>
+ * <p>
+ *     Taxa have a unique identifier.
+ *     Synonyms and common names may have multiple mappings.
+ * </p>
+ *
  * @author Doug Palmer &lt;Doug.Palmer@csiro.au&gt;
-
+ *
  * Copyright (c) 2015 CSIRO
  */
 class NameDatabase {
+    /** How taxonomy terms are ranked */
     RankStructure ranks
+    /** The list of common names, keyed by LSID */
     Map<String, List<CommonName>> commonNames = [:]
+    /** The map of synonyns, keyed by LSID */
     Map<String, List<Synonym>> synonyms = [:]
+    /** The map of taxa, keyed by LSID */
     Map<String, List<Taxon>> taxa = [:]
+    /** Errors associated with the database */
     List<ErrorReport> errors = []
     /** The highest rank level in the taxa */
     RankStructure.Rank topRank
@@ -32,12 +47,29 @@ class NameDatabase {
     /** The number of synonyms with mutliple taxa */
     int multipleSynonyms
 
+    /**
+     * Construct a new database
+     * <p>
+     *     Different fields (eg. zoology and botany) use slightly different
+     *     taxonomic structures, the supplied rnak
+     *
+     * @param dwca The dwca file
+     * @param ranks The rank structure to use
+     */
 
     NameDatabase(File dwca, RankStructure ranks) {
         this.ranks = ranks;
         load(dwca)
     }
 
+    /**
+     * Load names from a CSV stream
+     *
+     * @param is The CSV stream
+     * @param clazz The class of entity being loaded
+     * @param dictionary The dictionary to load into
+     * @param allowDuplicates Allow duplicate keys. If true, a list of entries is accumulated
+     */
     protected <T extends NameEntry> void loadNames(InputStream is, Class<T> clazz, Map<String, List<T>> dictionary, boolean allowDuplicates) {
         Reader reader = null
         CSVReader csv
@@ -65,6 +97,11 @@ class NameDatabase {
         }
     }
 
+    /**
+     * Load a DwCA file
+     *
+     * @param zip The zipped DwCA file.
+     */
     protected void load(File zip) {
         ZipFile zf = new ZipFile(zip)
         XmlSlurper slurper = new XmlSlurper()
@@ -83,6 +120,13 @@ class NameDatabase {
         }
     }
 
+    /**
+     * Add an error
+     *
+     * @param entry The entry that caused the error
+     * @param error An error description
+     * @param errorClass The type of error
+     */
     def error(NameEntry entry, error, ErrorClass errorClass) {
         errors << new ErrorReport(entry, error, errorClass)
     }
@@ -147,6 +191,12 @@ class NameDatabase {
                 taxon.check(this)
     }
 
+    /**
+     * Generate a error report, listing all found errors.
+     *
+     * @param writer Where to report to
+     * @param limit A limit of the number of errors to list in each category, -1 for all errors
+     */
     def report(PrintWriter writer, int limit) {
         writer.println("\"Statistics\",\"\",\"\",\"\",\"\",\"\"")
         writer.println("\"\",\"Total Taxa\",\"${taxa.size()}\",\"\",\"\",\"\"")

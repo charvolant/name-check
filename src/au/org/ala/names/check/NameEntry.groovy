@@ -3,7 +3,8 @@ package au.org.ala.names.check
 /**
  * Generic name entry
  * <p>
- *     Ignores rank-code, rank, synionymy, cc_licence, cc_attributionURL, exluded
+ *     This is derived from the
+ *     Ignores synionymy, cc_licence, cc_attributionURL, exluded
  *     until we know what to do with them
  *
  * @author Doug Palmer &lt;Doug.Palmer@csiro.au&gt;
@@ -46,12 +47,35 @@ abstract class NameEntry {
         source = nullcheck line[14]
     }
 
+    /**
+     * The key of the entry
+     *
+     * @return What is probably a unique key
+     */
     abstract String key()
 
+    /**
+     * A string classifier for the entry
+     *
+     * @return A simple type string
+     */
     abstract String classifier()
 
+    /**
+     * Check the entry against a database
+     * <p>
+     *     The entry is checked for consistency against other entries in the database.
+     *     Any errors are recorded in the database.
+     *
+     * @param database The database
+     */
     abstract void check(NameDatabase database)
 
+    /**
+     * Describe this entry in CSV form
+     *
+     * @param writer The writer to append the description to
+     */
     void describe(PrintWriter writer) {
         writer.print("\"")
         writer.print(classifier())
@@ -76,6 +100,11 @@ abstract class NameEntry {
     }
 }
 
+/**
+ * A common name.
+ * <p>
+ * Common names link to a taxon via the {@link #synonymOfLsid} field
+ */
 class CommonName extends NameEntry {
     CommonName(String[] line) { super(line) }
 
@@ -99,6 +128,11 @@ class CommonName extends NameEntry {
     }
 }
 
+/**
+ * A formal synonym.
+ * <p>
+ * Synonyms link to a taxon via the {@link #synonymOfLsid} field
+ */
 class Synonym extends NameEntry {
     Synonym(String[] line) { super(line) }
 
@@ -129,6 +163,9 @@ class Synonym extends NameEntry {
     }
 }
 
+/**
+ * A taxonomic entity.
+ */
 class Taxon extends NameEntry {
     int commonNameCount
     int synonymCount

@@ -3,6 +3,13 @@ package au.org.ala.names.check
 /**
  * Check a DWCA name file.
  *
+ * Arguments:
+ * <ol>
+ *     <li>The path to the DwCA artchive</li>
+ *     <li>The name of the file containing the taxonomic ranking</li>
+ *     <li>(optional) Output file for a report</li>
+ * </ol>
+ *
  * @author Doug Palmer &lt;Doug.Palmer@csiro.au&gt;
 
  * Copyright (c) 2015 CSIRO

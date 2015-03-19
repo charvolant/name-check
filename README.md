@@ -11,9 +11,19 @@ The program then checks the taxonomy data looking for
 * Dangling parent relationships for taxa
 * Problems with taxon ranks not following the hierarchy
 * Circular parent links
+* Odd-looking numbers of common names and synonyms attached to a taxon
+* Taxa with no parent that don't appear to be a common ancestor
 
 To run it, you need to run the Check script with the name of a DwCA zip archive and (optionally) the name of
 a CSV file to dump the error report to.
+
+## Ranks
+
+The rank structure files are JSON files that describe the taxonomic levels used by a particular field.
+There are two files botany-ranks.json and zoology-ranks.json.
+Levels are automatically allocated; explicitly specifying a level less than 0 indicates that the
+rank doesn't fit very well into the ranking structure and should be ignored when trying to build
+a view of whether the parent/child taxa are consistent.
 
 ## Stuff that is not so good
 
